@@ -1,0 +1,4 @@
+- name: Copy OKD Install Manifest
+  template: 
+    src: install-config.yaml
+    dest: /home/bcladmin/install_dir/install-config.yaml

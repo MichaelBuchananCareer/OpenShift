@@ -1,0 +1,36 @@
+- name: Install HAProxy Load Balancer
+  ansible.builtin.dnf:
+    name: haproxy
+    state: present
+    update_cache: true
+  
+- name: Configure HAProxy
+  template: 
+    src: haproxy.cfg
+    dest: /etc/haproxy/haproxy.cfg
+
+- name: Open Firewall Ports for HAProxy
+  ansible.posix.firewalld:
+    port: "{{ item }}"
+    permanent: true
+    state: enabled
+    immediate: true
+  loop:
+    - 6443/tcp
+    - 22623/tcp
+    - 9000/tcp
+
+- name: Open Firewall Services for HAProxy
+  ansible.posix.firewalld:
+    service: "{{ item }}"
+    permanent: true
+    state: enabled
+    immediate: true
+  loop:
+    - http
+    - https
+
+- name: Start service haproxy, if not started
+  ansible.builtin.service:
+    name: haproxy
+    state: started

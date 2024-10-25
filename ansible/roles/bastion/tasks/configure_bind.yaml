@@ -1,0 +1,17 @@
+---
+- name: Create Subdomain
+  template:
+    src: named.conf
+    dest: /etc/named.conf
+    
+- name: Create forward zone
+  template: 
+    src: okd.buchcolab.com.db
+    dest: /var/named/okd.buchcolab.com.db
+
+- name: Create reverse zone
+  template: 
+    src: 86.168.192.in-addr.arpa
+    dest: /var/named/86.168.192.in-addr.arpa
+  notify:
+    - Restart Named

@@ -1,0 +1,21 @@
+$TTL 1W 
+@ IN SOA bastion.okd.buchcolab.com. root.okd.buchcolab.com. ( 
+3 ;Serial 
+21600 ;Refresh 
+3600 ;Retry 
+604800 ;Expire 
+86400 ;Minimum TTL 
+) 
+;End Common Header Definition 
+
+; name servers
+   IN     NS     bastion.okd.buchcolab.com.
+
+250.86.168.192.in-addr.arpa. IN PTR api.okd.buchcolab.com.;
+250.86.168.192.in-addr.arpa. IN PTR api-int.okd.buchcolab.com.;
+200.86.168.192.in-addr.arpa. IN PTR bootstrap.okd.buchcolab.com.; 
+201.86.168.192.in-addr.arpa. IN PTR master1.okd.buchcolab.com.; 
+;202.86.168.192.in-addr.arpa. IN PTR master2.okd.buchcolab.com.; 
+;203.86.168.192.in-addr.arpa. IN PTR master3.okd.buchcolab.com.; 
+;204.86.168.192.in-addr.arpa. IN PTR worker1.okd.buchcolab.com.; 
+;205.86.168.192.in-addr.arpa. IN PTR worker2.okd.buchcolab.com.;

@@ -1,0 +1,86 @@
+------ okd4-svc--------
+sudo dnf install -y epel-release
+sudo dnf update -y
+sudo systemctl reboot
+*** Clone the repo files
+cd
+sudo dnf install -y git
+git clone https://github.com/rossbrigoli/okd4_files.git
+*** Set the domain info
+cd okd4-files
+./setdomain.sh okd buchcolab.com
+*** Set up HA proxy
+cd 
+sudo dnf install haproxy -y
+sudo cp okd4_files/haproxy.cfg /etc/haproxy/haproxy.cfg
+sudo setsebool -P haproxy_connect_any=1
+sudo systemctl enable haproxy
+sudo systemctl start haproxy
+sudo systemctl status haproxy
+*** Open ports
+sudo firewall-cmd --permanent --add-port=6443/tcp
+sudo firewall-cmd --permanent --add-port=22623/tcp
+sudo firewall-cmd --permanent --add-port=9000/tcp
+sudo firewall-cmd --permanent --add-service=http
+sudo firewall-cmd --permanent --add-service=https
+sudo firewall-cmd --reload
+*** Serve the install files over http
+sudo dnf install -y httpd
+sudo sed -i 's/Listen 80/Listen 8080/' /etc/httpd/conf/httpd.conf
+sudo setsebool -P httpd_read_user_content 1
+sudo systemctl enable httpd
+sudo systemctl start httpd
+sudo firewall-cmd --permanent --add-port=8080/tcp
+sudo firewall-cmd --reload
+curl localhost:8080
+*** download the installer files
+cd
+wget https://github.com/okd-project/okd/releases/download/4.15.0-0.okd-2024-03-10-010116/openshift-client-linux-4.15.0-0.okd-2024-03-10-010116.tar.gz
+wget https://github.com/okd-project/okd/releases/download/4.15.0-0.okd-2024-03-10-010116/openshift-install-linux-4.15.0-0.okd-2024-03-10-010116.tar.gz
+tar -zxvf openshift-client-linux-4.15.0-0.okd-2024-03-10-010116.tar.gz
+tar -zxvf openshift-install-linux-4.15.0-0.okd-2024-03-10-010116.tar.gz
+#Move the kubectl, oc, and openshift-install to /usr/local/bin and show the version:
+sudo mv kubectl oc openshift-install /usr/local/bin/
+#Test oc client and openshift-install command
+oc version
+openshift-install version
+*** Create SSH Key
+ssh-keygen
+*** Create install files
+cd
+mkdir install_dir
+cp okd4_files/install-config.yaml ./install_dir
+
+ssh-rsa ******
+
+
+Pull Secret: ******
+
+
+**** Generate Ignition Files
+cd
+openshift-install create manifests --dir=install_dir/
+# This lines disables schedule application pods on the master nodes 
+sed -i 's/mastersSchedulable: true/mastersSchedulable: False/' install_dir/manifests/clust\
+er-scheduler-02-config.yml
+openshift-install create ignition-configs --dir=install_dir/
+
+rm -drf /var/www/html/okd4
+sudo mkdir /var/www/html/okd4
+
+sudo cp -R install_dir/* /var/www/html/okd4/
+sudo chown -R apache: /var/www/html/
+sudo chmod -R 755 /var/www/html/
+curl localhost:8080/okd4/metadata.json
+*** download core files and sig
+cd /var/www/html/okd4
+sudo wget https://builds.coreos.fedoraproject.org/prod/streams/stable/builds/39.20240309.3.0/x86_64/fedora-coreos-39.20240309.3.0-metal.x86_64.raw.xz
+sudo wget https://builds.coreos.fedoraproject.org/prod/streams/stable/builds/39.20240309.3.0/x86_64/fedora-coreos-39.20240309.3.0-metal.x86_64.raw.xz.sig
+sudo mv fedora-coreos-39.20240309.3.0-metal.x86_64.raw.xz fcos.raw.xz
+sudo mv fedora-coreos-39.20240309.3.0-metal.x86_64.raw.xz.sig fcos.raw.xz.sig
+sudo chown -R apache: /var/www/html/
+sudo chmod -R 755 /var/www/html/
+
+
+
+sudo coreos-installer install /dev/sda --image-url http://192.168.86.210:8080/okd4/fcos.raw.xz --insecure-ignition --ignition-url http://192.168.86.210:8080/okd4/bootstrap.ign

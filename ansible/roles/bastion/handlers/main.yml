@@ -1,0 +1,4 @@
+---
+# handlers file for bastion
+- name: Restart Named
+  service: name=named state=restarted

@@ -1,0 +1,7 @@
+[bastion]
+192.168.86.250 ansible_ssh_user=*****
+
+[all:vars]
+ansible_connection: ssh 
+ansible_user: ******
+ansible_pass: "*****"

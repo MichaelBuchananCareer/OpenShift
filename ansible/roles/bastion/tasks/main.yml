@@ -1,0 +1,7 @@
+---
+- include_tasks: install-bind.yaml
+- include_tasks: configure_bind.yaml
+- include_tasks: install-dhcp.yaml
+- include_tasks: install-apache.yaml
+- include_tasks: install-haproxy.yaml
+- include_tasks: copy-manifests.yaml

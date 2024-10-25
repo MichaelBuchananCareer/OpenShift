@@ -1,0 +1,58 @@
+---
+- name: Setup Proxmox VMs
+  hosts: localhost
+
+  tasks: 
+  - name: "Create Services VM"
+    community.general.proxmox_kvm:
+      api_host: 192.168.86.101
+      api_user: root@pam
+      api_password: '!nG0dW3Trust'
+      vmid: "{{ item.id }}"
+      name: "{{ item.name }}"
+      node: "{{ item.node }}"
+      boot: "order=scsi0;ide0"
+      ostype: "l26"
+      sockets: 2
+      cores: 2
+      memory: "{{ item.memory }}"
+      net:
+        net0: "virtio={{item.mac}},bridge=vmbr0,tag=20"
+      nameservers:
+        - 1.1.1.1
+        - 1.0.0.1
+      scsihw: 'virtio-scsi-single'
+      storage: local-lvm
+      ide: '{"ide0":"local:iso/{{item.iso}},media=cdrom"}'
+      state: present
+    loop:
+      - {id: "100", name: 'bastion', node: 'proxmox2', memory: "4096", mac: "BC:24:11:ED:FB:58", iso: "CentOS-Stream-8-20240325.0-x86_64-dvd1.iso"}
+      - {id: "101", name: 'okd4-bootstrap', node: 'proxmox3', memory: "4096", mac: "BC:24:11:42:6A:1F", iso: "fedora-coreos-39.20240309.3.0-live.x86_64.iso"}
+      - {id: "102", name: 'okd4-cp1', node: 'proxmox1', memory: "16384", mac: "BC:24:11:3F:22:06", iso: "fedora-coreos-39.20240309.3.0-live.x86_64.iso"}
+      - {id: "103", name: 'okd4-cp2', node: 'proxmox1', memory: "16384", mac: "BC:24:11:28:5F:79", iso: "fedora-coreos-39.20240309.3.0-live.x86_64.iso"}
+      - {id: "104", name: 'okd4-cp3', node: 'proxmox1', memory: "16384", mac: "BC:24:11:05:36:04", iso: "fedora-coreos-39.20240309.3.0-live.x86_64.iso"}
+      - {id: "105", name: 'okd4-w1', node: 'proxmox1', memory: "16384", mac: "BC:24:11:60:E9:F8", iso: "fedora-coreos-39.20240309.3.0-live.x86_64.iso"}
+      - {id: "106", name: 'okd4-w2', node: 'proxmox1', memory: "16384", mac: "BC:24:11:4C:5E:C3", iso: "fedora-coreos-39.20240309.3.0-live.x86_64.iso"}
+
+  - name: create disk
+    community.general.proxmox_disk:
+      api_host: "{{ item.host}}"
+      api_user: ****
+      api_password: '****'
+      vmid: "{{item.id}}"
+      disk: scsi0
+      storage: local-lvm
+      size: "{{item.size}}"
+      create: forced
+      state: present
+    loop:
+      - {id: "100", host: "192.168.86.102", size: "100" }
+      - {id: "101", host: "192.168.86.103", size: "100" }
+      - {id: "102", host: "192.168.86.101", size: "100" }
+      - {id: "103", host: "192.168.86.101", size: "100" }
+      - {id: "104", host: "192.168.86.101", size: "100" }
+      - {id: "105", host: "192.168.86.101", size: "100" }
+      - {id: "106", host: "192.168.86.101", size: "100" }
+
+      
+

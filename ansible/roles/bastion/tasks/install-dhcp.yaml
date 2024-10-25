@@ -1,0 +1,19 @@
+---
+- name: Install DHCP
+  ansible.builtin.dnf:
+    name: dhcp-server
+    state: present
+    update_cache: true
+
+- name: Open Firewall Ports for dhcp
+  ansible.posix.firewalld:
+    service: dhcp
+    permanent: true
+    state: enabled
+    immediate: true
+
+- name: DHCP Info
+  template: 
+    src: dhcpd.conf
+    dest: /etc/dhcp/dhcpd.conf
+

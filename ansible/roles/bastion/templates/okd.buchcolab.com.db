@@ -1,0 +1,36 @@
+;[1] Begin Common Header Definition 
+$TTL 86400 
+@ IN SOA bastion.okd.buchcolab.com. root.okd.buchcolab.com. ( 
+3 ;Serial 
+21600 ;Refresh 
+3600 ;Retry 
+604800 ;Expire 
+86400 ;Minimum TTL 
+) 
+;End Common Header Definition 
+
+
+;Name Server Information [2] 
+   IN     NS     bastion.okd.buchcolab.com.
+
+;IP address of Name Server [3] 
+bastion IN A 192.168.86.250 
+ 
+;api internal and external purposes [4] 
+api        IN	A	192.168.86.250  
+api-int	IN	A	192.168.86.250  
+
+;wildcard application [5] 
+*.apps	IN	A	192.168.86.250 
+
+;bootstrap node to start cluster install only [6] 
+bootstrap  IN	A	192.168.86.200  
+
+;master nodes [7] 
+master1	IN	A	192.168.86.201  
+;master2	IN	A	192.168.86.202  
+;master3	IN	A	192.168.86.203 
+
+;worker nodes [8] 
+;worker1	IN	A	192.168.86.204 
+;worker2 	IN	A	192.168.86.205

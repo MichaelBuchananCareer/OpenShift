@@ -1,0 +1,27 @@
+---
+- name: Install Apache
+  ansible.builtin.dnf:
+    name: " {{ item }}"
+    state: present
+    update_cache: true
+  loop:
+    - httpd
+    - policycoreutils-python-utils
+
+- name: Change Listen Directive
+  ansible.builtin.command: "{{ item }}"
+  loop: 
+    - sudo sed -i 's/Listen 80/Listen 8080/' /etc/httpd/conf/httpd.conf
+    - sudo setsebool -P httpd_read_user_content 1
+
+- name: Open Firewall Ports for apache
+  ansible.posix.firewalld:
+    port: 8080/tcp
+    permanent: true
+    state: enabled
+    immediate: true
+
+- name: Start service httpd, if not started
+  ansible.builtin.service:
+    name: httpd
+    state: started
